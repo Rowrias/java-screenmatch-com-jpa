@@ -14,8 +14,8 @@ public class Principal {
     private Scanner leitura = new Scanner(System.in);
     private ConsumoApi consumo = new ConsumoApi();
     private ConverteDados conversor = new ConverteDados();
-    private final String ENDERECO = "https://www.omdbapi.com/?t=";
-    private final String API_KEY = "&apikey=6585022c";
+    private final String API_KEY = "?apikey=db9c443d&t=";
+    private final String ENDERECO = "https://www.omdbapi.com/";
     private List<DadosSerie> dadosSeries = new ArrayList<>();
 
     public void exibeMenu() {
@@ -31,6 +31,7 @@ public class Principal {
 	
 	        System.out.println(menu);
 	        opcao = leitura.nextInt();
+	        leitura.nextLine();
 	        switch (opcao) {
 	            case 1:
 	                buscarSerieWeb();
@@ -59,7 +60,7 @@ public class Principal {
     private DadosSerie getDadosSerie() {
         System.out.println("Digite o nome da série para busca");
         var nomeSerie = leitura.nextLine();
-        var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY);
+        var json = consumo.obterDados(ENDERECO + API_KEY + nomeSerie.replace(" ", "+"));
         DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
         return dados;
     }
@@ -69,7 +70,7 @@ public class Principal {
         List<DadosTemporada> temporadas = new ArrayList<>();
 
         for (int i = 1; i <= dadosSerie.totalTemporadas(); i++) {
-            var json = consumo.obterDados(ENDERECO + dadosSerie.titulo().replace(" ", "+") + "&season=" + i + API_KEY);
+            var json = consumo.obterDados(ENDERECO + API_KEY + dadosSerie.titulo().replace(" ", "+") + "&season=" + i);
             DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
             temporadas.add(dadosTemporada);
         }
