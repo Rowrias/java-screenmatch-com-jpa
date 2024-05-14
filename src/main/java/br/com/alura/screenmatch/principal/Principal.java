@@ -37,6 +37,9 @@ public class Principal {
 	                1 - Buscar séries
 	                2 - Buscar episódios
 	                3 - Listar séries buscadas
+	                4 - Buscar série por titulo
+	                5 - Buscar séries por ator
+	                6 = Top 5 séries
 	                
 	                0 - Sair                                 
 	                """;
@@ -54,6 +57,15 @@ public class Principal {
 	            case 3:
 	            	listarSeriesBuscadas();
 	            	break;
+	            case 4:
+	            	buscarSeriePorTitulo();
+	            	break;
+	            case 5:
+	            	buscarSeriesPorAtor();
+	            	break;
+	            case 6:
+	            	buscarTop5Series();
+	            	break;
 	            case 0:
 	                System.out.println("Saindo...");
 	                break;
@@ -62,8 +74,8 @@ public class Principal {
 	        }
     	}
     }
-
-    private void buscarSerieWeb() {
+ 	
+	private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
         Serie serie = new Serie(dados);
         //dadosSeries.add(dados);
@@ -84,9 +96,7 @@ public class Principal {
     	System.out.println("Escolha uma série pelo nome: ");
     	var nomeSerie = leitura.nextLine();
     	
-    	Optional<Serie> serie = series.stream()
-    			.filter(s -> s.getTitulo().toLowerCase().contains(nomeSerie.toLowerCase()))
-    			.findFirst();
+    	Optional<Serie> serie = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
     	
     	if(serie.isPresent()) {
     		
@@ -118,5 +128,36 @@ public class Principal {
     				.sorted(Comparator.comparing(Serie::getGenero))
     				.forEach(System.out::println);
     }
+    
+    private void buscarSeriePorTitulo() {
+    	System.out.println("Escolha uma série pelo nome: ");
+    	var nomeSerie = leitura.nextLine();
+    	Optional<Serie> serieBuscada = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
+    	
+    	if (serieBuscada.isPresent()) {
+    		System.out.println("Dados da série: " + serieBuscada.get());
+    	} else {
+    		System.out.println("Série não encontrada!");
+    	}
+    	
+	}
+    
+    private void buscarSeriesPorAtor() {
+    	System.out.println("Qual o nome para busca?");
+    	var nomeAtor = leitura.nextLine();
+    	System.out.println("Avaliação a partir de que valor?");
+    	var avaliacao = leitura.nextDouble();
+    	List<Serie> seriesEncontradas = repositorio.findByAtoresContainingIgnoreCaseAndAvaliacaoGreaterThanEqual(nomeAtor, avaliacao);
+    	System.out.println("Séries em que " + nomeAtor + " trabalhou: ");
+    	seriesEncontradas.forEach(s -> 
+    			System.out.println(s.getTitulo() + " Avaliação: " + s.getAvaliacao()));
+    }
+
+	private void buscarTop5Series() {
+		List<Serie> serieTop = repositorio.findTop5ByOrderByAvaliacaoDesc();
+		serieTop.forEach( s ->
+			System.out.println(s.getTitulo() + " Avaliação: " + s.getAvaliacao()));
+		
+	}
     
 }
