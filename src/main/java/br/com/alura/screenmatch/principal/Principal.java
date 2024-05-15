@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import br.com.alura.screenmatch.model.Categoria;
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
 import br.com.alura.screenmatch.model.Episodio;
@@ -39,7 +40,9 @@ public class Principal {
 	                3 - Listar séries buscadas
 	                4 - Buscar série por titulo
 	                5 - Buscar séries por ator
-	                6 = Top 5 séries
+	                6 - Top 5 séries
+	                7 - Buscar série por categoria
+	                8 - Filtrar séries
 	                
 	                0 - Sair                                 
 	                """;
@@ -65,6 +68,12 @@ public class Principal {
 	            	break;
 	            case 6:
 	            	buscarTop5Series();
+	            	break;
+	            case 7:
+	            	buscarSeriePorCategoria();
+	            	break;
+	            case 8:
+	            	filtrarSeriesPorTemporadaEAvaliacao();
 	            	break;
 	            case 0:
 	                System.out.println("Saindo...");
@@ -157,7 +166,28 @@ public class Principal {
 		List<Serie> serieTop = repositorio.findTop5ByOrderByAvaliacaoDesc();
 		serieTop.forEach( s ->
 			System.out.println(s.getTitulo() + " Avaliação: " + s.getAvaliacao()));
-		
 	}
     
+	private void buscarSeriePorCategoria() {
+		System.out.println("Deseja buscar séries de que categoria/gênero? ");
+		var nomeGenero = leitura.nextLine();
+		Categoria categoria = Categoria.fromPortugues(nomeGenero);
+		List<Serie> seriesPorCategoria = repositorio.findByGenero(categoria);
+		System.out.println("Séries  da categoria " + nomeGenero);
+		seriesPorCategoria.forEach(System.out::println);
+	}
+	
+	private void filtrarSeriesPorTemporadaEAvaliacao(){
+        System.out.println("Filtrar séries até quantas temporadas? ");
+        var totalTemporadas = leitura.nextInt();
+        leitura.nextLine();
+        System.out.println("Com avaliação a partir de que valor? ");
+        var avaliacao = leitura.nextDouble();
+        leitura.nextLine();
+        List<Serie> filtroSeries = repositorio.findByTotalTemporadasLessThanEqualAndAvaliacaoGreaterThanEqual(totalTemporadas, avaliacao);
+        System.out.println("*** Séries filtradas ***");
+        filtroSeries.forEach(s ->
+                System.out.println(s.getTitulo() + "  - avaliação: " + s.getAvaliacao()));
+    }
+
 }
